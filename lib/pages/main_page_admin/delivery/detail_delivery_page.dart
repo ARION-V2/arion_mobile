@@ -17,8 +17,8 @@ class _DetailDeliveryPageState extends State<DetailDeliveryPage> {
   @override
   void initState() {
     super.initState();
-    // delivery.value = deliveryController.mappingDeliveryModel
-    //     .firstWhere((element) => element.id == widget.idDelivery);
+    delivery.value = deliveryController.deliveries
+        .firstWhere((element) => element.id == widget.idDelivery);
   }
 
   @override
@@ -225,9 +225,9 @@ class _DetailDeliveryPageState extends State<DetailDeliveryPage> {
                   child: GestureDetector(
                     onTap: () async {
                       Get.to(
-                        () => const PhotoViewCustom(
+                        () =>  PhotoViewCustom(
                           [
-                            'https://img.okezone.com/content/2021/07/26/338/2445968/begini-cara-aman-terima-paket-online-saat-pandemi-covid-19-sZCekj4kXQ.jpg'
+                            delivery.value!.photoReceived!
                           ],
                         ),
                       );

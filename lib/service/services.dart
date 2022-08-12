@@ -2,8 +2,8 @@
 String googleMapsKey = "AIzaSyCXEykmj3RsEDFNBrLCmA-lmxKCWqT-zCI";
 
 
-// String baseUrl = "http://10.0.2.2:8000";
-String baseUrl ="http://10.0.146.157:8080";
+String baseUrl = "http://10.0.2.2:8000";
+// String baseUrl ="http://10.0.146.157:8080";
 
 
 
