@@ -9,26 +9,35 @@ class DaftarPengantaranPage extends StatefulWidget {
 
 class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
   final deliveryController = Get.find<DeliveryController>();
+  TspAnnaling? matrixDistance;
   @override
   void initState() {
     super.initState();
-    deliveryController.getMappingAll();
+    deliveryController.getWaitingDelivery();
+    matrixDistance = deliveryController.resultMatrix.value;
   }
 
   @override
   Widget build(BuildContext context) {
     return GeneralPage(
       onRefresh: () async {
-        await deliveryController.getMappingAll();
+        await deliveryController.getWaitingDelivery();
       },
       titleAppBar: Obx(() => Text(
-          'Daftar Pengantaran (${deliveryController.mappingDeliveryModel.length})')),
-      actionsAppBar: const [
+          'Daftar Pengantaran (${deliveryController.waitingDeliveriesModel.length})')),
+      actionsAppBar: [
         Padding(
-          padding: EdgeInsets.only(right: defaultMargin),
-          child: Icon(
-            Icons.search,
-            color: whiteColor,
+          padding: const EdgeInsets.only(right: defaultMargin),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() =>const MatrixJarakPage());
+              },
+              child: Text(
+                "Matrix",
+                style: whiteTextFontBold,
+              ),
+            ),
           ),
         )
       ],
@@ -46,19 +55,25 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    (deliveryController.mappingDeliveryModel.isNotEmpty)
+                    Text(
+                      "Total Jarak = ${deliveryController.resultMatrix.value?.jarak!.toInt()} m atau ${(deliveryController.resultMatrix.value!.jarak!/1000).toStringAsFixed(2)} km",
+                      style: blackTextFontBold,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    (deliveryController.resultMapping.isNotEmpty)
                         ? Column(
                             children: List.generate(
-                              deliveryController.mappingDeliveryModel.length,
+                              deliveryController.resultMapping.length,
                               (index) => GestureDetector(
                                 onTap: () {
                                   if (deliveryController
-                                          .mappingDeliveryModel[index]
-                                          .fromDelivery !=
+                                          .resultMapping[index].fromDelivery !=
                                       null) {
                                     Get.to(DetailPengantaranPage(
                                       delivery: deliveryController
-                                          .mappingDeliveryModel[index],
+                                          .resultMapping[index],
                                     ));
                                   }
                                 },
@@ -69,7 +84,7 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: (deliveryController
-                                                  .mappingDeliveryModel[index]
+                                                  .resultMapping[index]
                                                   .fromGudang !=
                                               null)
                                           ? accentColor1
@@ -82,11 +97,11 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       if (deliveryController
-                                              .mappingDeliveryModel[index]
+                                              .resultMapping[index]
                                               .fromDelivery !=
                                           null)
                                         Text(
-                                          "No Resi : ${deliveryController.mappingDeliveryModel[index].fromDelivery?.noResi}",
+                                          "No Resi : ${deliveryController.resultMapping[index].fromDelivery?.noResi}",
                                           style: blackTextFontTitleBold,
                                         ),
                                       const SizedBox(
@@ -99,16 +114,15 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                                             child: Text("Posisi"),
                                           ),
                                           (deliveryController
-                                                      .mappingDeliveryModel[
-                                                          index]
+                                                      .resultMapping[index]
                                                       .fromDelivery
                                                       ?.partner
                                                       ?.marketName !=
                                                   null)
                                               ? Text(
-                                                  ": ${deliveryController.mappingDeliveryModel[index].fromDelivery?.partner?.marketName}")
+                                                  ": ${deliveryController.resultMapping[index].fromDelivery?.partner?.marketName}")
                                               : Text(
-                                                  ": ${deliveryController.mappingDeliveryModel[index].fromGudang?.namaGudang}"),
+                                                  ": ${deliveryController.resultMapping[index].fromGudang?.namaGudang}"),
                                         ],
                                       ),
                                       Row(
@@ -118,16 +132,15 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                                             child: Text("Selanjutnya"),
                                           ),
                                           (deliveryController
-                                                      .mappingDeliveryModel[
-                                                          index]
+                                                      .resultMapping[index]
                                                       .nextDelivery
                                                       ?.partner
                                                       ?.marketName !=
                                                   null)
                                               ? Text(
-                                                  ": ${deliveryController.mappingDeliveryModel[index].nextDelivery?.partner?.marketName}")
+                                                  ": ${deliveryController.resultMapping[index].nextDelivery?.partner?.marketName}")
                                               : Text(
-                                                  ": ${deliveryController.mappingDeliveryModel[index].toGudang?.namaGudang}"),
+                                                  ": ${deliveryController.resultMapping[index].toGudang?.namaGudang}"),
                                         ],
                                       ),
                                       Row(
@@ -137,7 +150,8 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                                             child: Text("Jarak"),
                                           ),
                                           Text(
-                                            ': ${(deliveryController.mappingDeliveryModel[index].distance! / 1000).toStringAsFixed(2)} km',
+                                            ' : ${(deliveryController.resultMapping[index].distance! / 1000).toStringAsFixed(2)} km',
+                                            // ': ${(deliveryController.resultMapping[index].distance!)}',
                                           )
                                         ],
                                       ),
@@ -148,13 +162,13 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                             ),
                           )
                         : const DataNotFoundWidget(),
-                    // (deliveryController.mappingDeliveryModel.isNotEmpty)
+                    // (deliveryController.resultMapping.isNotEmpty)
                     //     ? Column(
                     //         children: List.generate(
                     //           deliveryController.waitingDeliveriesModel.length,
                     //           (index) => ItemPengantaranWidget(
                     //             delivey: deliveryController
-                    //                 .mappingDeliveryModel[index],
+                    //                 .resultMapping[index],
                     //             onTap: () {
                     //               // Get.to(
                     //               //   () => DetailPengantaranPage(
@@ -186,7 +200,7 @@ class _DaftarPengantaranPageState extends State<DaftarPengantaranPage> {
                         () => const MapsLocationView(),
                         binding: MapsLocationBinding(),
                         arguments: MapLocationArgument(
-                          deliveries: deliveryController.mappingDeliveryModel,
+                          deliveries: deliveryController.resultMapping,
                           // deliveryPlusDirection:
                           //     deliveryController.waitingDeliveriesPlusDirection,
                         ),

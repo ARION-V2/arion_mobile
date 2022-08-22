@@ -2,27 +2,30 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:arion/controller/location_controller.dart';
+import 'package:arion/models/Tsp_anneling.dart';
 import 'package:arion/models/delivery.dart';
+import 'package:arion/models/gudang.dart';
 import 'package:arion/models/mapping_delivery.dart';
-import 'package:arion/models/partner.dart';
+import 'package:arion/service/anneling_services.dart';
 import 'package:arion/service/delivery_services.dart';
 import 'package:arion/service/direction_services.dart';
 import 'package:arion/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DeliveryController extends GetxController with StateMixin {
   var deliveries = List<Delivery>.empty().obs;
   final locationController = Get.find<LocationController>();
-
   var waitingDeliveriesModel = List<Delivery>.empty().obs;
-  var waitingDeliveriesPlusDirection = List<Delivery>.empty().obs;
   var doneDeliveriesModel = List<Delivery>.empty().obs;
-  var mappingDeliveryModel = List<MappingDelivery>.empty().obs;
+
+  var resultMapping = List<MappingDelivery>.empty().obs;
+
+  var gudang = Rxn<Gudang>();
+  var resultMatrix = Rxn<TspAnnaling>();
   var loadingMapping = false.obs;
 
   Future<void> getAll({
@@ -43,17 +46,63 @@ class DeliveryController extends GetxController with StateMixin {
     }
   }
 
-  Future<void> getMappingAll() async {
-    change(null, status: RxStatus.loading());
-    var result = await DeliveryServices().mappingDelivery();
-
+  Future<void> runAnneling() async {
+    var result = await AnnelingServices().runAnneling(
+        nameGundang: "-6.408288,108.281561",
+        destinations: waitingDeliveriesModel
+            .map((element) => element.koordinateString)
+            .toList());
     if (result.value != null) {
-      mappingDeliveryModel.value = result.value;
-      change(null, status: RxStatus.success());
-    } else {
-      change(null, status: RxStatus.error());
+      List<MappingDelivery> resultListMapping = [];
+      TspAnnaling resultFix = result.value;
+      resultMatrix.value =resultFix;
+      for (var i = 0; i < resultFix.urutanTujuan!.length; i++) {
+        if (i == 0) {
+          resultListMapping.add(
+            MappingDelivery(
+              distance: resultFix.urutanTujuan![i].jarak,
+              fromGudang: Gudang(
+                  id: 1,
+                  namaGudang: "Ini Gudang",
+                  latitude: "-6.408288",
+                  longitude: "108.281561"),
+              nextDelivery: waitingDeliveriesModel.firstWhere((element) =>
+                  element.koordinateString ==
+                  resultFix.urutanTujuan![i].toAddresses),
+            ),
+          );
+        } else if (i == resultFix.urutanTujuan!.length - 1) {
+          resultListMapping.add(
+            MappingDelivery(
+                distance: resultFix.urutanTujuan![i].jarak,
+                toGudang: Gudang(
+                    id: 1,
+                    namaGudang: "Ini Gudang",
+                    latitude: "-6.408288",
+                    longitude: "108.281561"),
+                fromDelivery: waitingDeliveriesModel.firstWhere((element) =>
+                    element.koordinateString ==
+                    resultFix.urutanTujuan![i].fromAddress)),
+          );
+        } else {
+          resultListMapping.add(
+            MappingDelivery(
+              distance: resultFix.urutanTujuan![i].jarak,
+              fromDelivery: waitingDeliveriesModel.firstWhere((element) =>
+                  element.koordinateString ==
+                  resultFix.urutanTujuan![i].fromAddress),
+              nextDelivery: waitingDeliveriesModel.firstWhere((element) =>
+                  element.koordinateString ==
+                  resultFix.urutanTujuan![i].toAddresses),
+            ),
+          );
+        }
+        resultMapping.value = resultListMapping;
+      }
     }
   }
+
+  Future<void> getGudang() async {}
 
   Future<void> getWaitingDelivery({
     String? status,
@@ -66,6 +115,7 @@ class DeliveryController extends GetxController with StateMixin {
 
     if (result.value != null) {
       waitingDeliveriesModel.value = result.value;
+      await runAnneling();
       change(null, status: RxStatus.success());
     } else {
       change(null, status: RxStatus.error());
@@ -100,7 +150,6 @@ class DeliveryController extends GetxController with StateMixin {
     );
     if (result.value != null) {
       if (delivery.id == null) {
-        await getMappingAll();
         await getAll();
         Get.back();
         Get.back();

@@ -12,7 +12,7 @@ class _DaftarRiwayatPageState extends State<DaftarRiwayatPage> {
   @override
   void initState() {
     super.initState();
-    deliveriesController.getDoneDeliveries();
+    // deliveriesController.getDoneDeliveries();
   }
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class _DaftarRiwayatPageState extends State<DaftarRiwayatPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Column(
+                ( deliveriesController.doneDeliveriesModel.isEmpty)?const DataNotFoundWidget():  Column(
                     children: List.generate(
                       deliveriesController.doneDeliveriesModel.length,
                       (index) => ItemPengantaranWidget(

@@ -41,7 +41,7 @@ void snackbarCustom(
 Future showLoading({String? status}) {
   return EasyLoading.show(
     status: status ?? 'loading...',
-    dismissOnTap: false,
+    dismissOnTap: true,
     maskType: EasyLoadingMaskType.black,
   );
 }

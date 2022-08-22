@@ -94,7 +94,7 @@ class DeliveryServices extends GetConnect {
       {required Delivery delivery, File? photoFile}) async {
     timeout = Duration(seconds: maxResponseTime);
 
-    try {
+    // try {
       Response response;
 
       String url = urlUpdateDelivery;
@@ -137,10 +137,10 @@ class DeliveryServices extends GetConnect {
       Delivery result = Delivery.fromJson(responseData['data']);
 
       return ApiReturnValue(value: result);
-    } catch (e) {
-      debugPrint('ADD/UPDATE Delivery Error: ${e.toString()}');
-      return ApiReturnValue(message: 'Error : ${e.toString()}');
-    }
+    // } catch (e) {
+    //   debugPrint('ADD/UPDATE Delivery Error: ${e.toString()}');
+    //   return ApiReturnValue(message: 'Error : ${e.toString()}');
+    // }
   }
 
   Future<ApiReturnValue> deleteDelivery(Delivery delivery) async {

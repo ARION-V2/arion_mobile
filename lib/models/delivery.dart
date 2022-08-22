@@ -63,6 +63,11 @@ class Delivery extends Equatable {
       // this.nextLatLngDelivery,
       });
 
+
+  String get koordinateString{
+    return "${partner!.latitude}, ${partner!.longitude}";
+  }
+
   Color get colorStatus {
     switch (status) {
       case "Pending":

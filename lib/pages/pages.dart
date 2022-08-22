@@ -9,6 +9,7 @@ import 'package:arion/controller/location_controller.dart';
 import 'package:arion/controller/partner_controller.dart';
 import 'package:arion/extensions/extensions.dart';
 import 'package:arion/main.dart';
+import 'package:arion/models/Tsp_anneling.dart';
 import 'package:arion/models/delivery.dart';
 import 'package:arion/models/mapping_delivery.dart';
 import 'package:arion/models/partner.dart';
@@ -22,6 +23,7 @@ import 'package:arion/pages/maps/maps_location/controllers/maps_location_control
 import 'package:arion/pages/maps/maps_location/views/maps_location_view.dart';
 import 'package:arion/pages/maps/selectLocation/bindings/select_location_binding.dart';
 import 'package:arion/pages/maps/selectLocation/views/select_location_view.dart';
+import 'package:arion/service/anneling_services.dart';
 import 'package:arion/service/delivery_services.dart';
 import 'package:arion/utils/api_return_value.dart';
 import 'package:arion/widgets/widgets.dart';
@@ -59,6 +61,8 @@ part 'main_page_kurir/daftar_antar/antar_paket_selesai_page.dart';
 part 'main_page_kurir/daftar_antar/tanda_tangan_page.dart';
 part 'main_page_kurir/riwayat_pod/daftar_riwayat_page.dart';
 part 'main_page_kurir/riwayat_pod/detail_riwayat_page.dart';
+part 'main_page_kurir/daftar_antar/matrix_jarak_page.dart';
+
 
 part 'main_page_admin/dashboard/dashboar_page.dart';
 

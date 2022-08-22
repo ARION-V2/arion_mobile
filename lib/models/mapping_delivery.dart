@@ -17,6 +17,7 @@ class MappingDelivery {
     this.fromDelivery,
     this.nextDelivery,
     this.direction,
+    this.distance,
   });
 
   MappingDelivery.fromJson(Map<String, dynamic> json) {

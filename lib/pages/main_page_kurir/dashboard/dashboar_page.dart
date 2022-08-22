@@ -16,7 +16,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     locationController.searchMyLocation();
     deliveryController.getDoneDeliveries();
-    deliveryController.getWaitingDelivery();
+    // deliveryController.getWaitingDelivery();
   }
 
   @override
